@@ -6,6 +6,8 @@ const mongoose = require('mongoose')
 const genres = require('./routes/genres')
 const customers = require('./routes/customers')
 const movies = require('./routes/movies')
+const rentals = require('./routes/rentals')
+const users = require('./routes/users')
 
 
 
@@ -20,8 +22,15 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 //ROUTES
-app.use('/api/genre', genres)
-app.use('/api/customer', customers)
-app.use('/api/movie', movies)
+app.use('/api/genres', genres)
+app.use('/api/customers', customers)
+app.use('/api/movies', movies)
+app.use('/api/rentals', rentals)
+app.use('/users', users)
+
+
 
 app.listen(PORT, () => { console.log(`app is running on PORT:${PORT}`) })
+
+
+///TODO: add object id validation directly into validate function
