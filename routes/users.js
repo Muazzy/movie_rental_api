@@ -1,4 +1,5 @@
 const express = require('express')
+const bcrypt = require('bcrypt')
 // const mongoose = require('mongoose')
 const { User, validateUser } = require('../models/user')
 
@@ -15,17 +16,27 @@ router.post('/', async (req, res) => {
         const error = validateUser(userObject)
         if (error) return res.status(400).send(error.details.at(0).message)
 
-        let user = User.findOne({ email: userObject.email })
+        let user = await User.findOne({ email: userObject.email })
+        console.log(user)
         if (user) return res.status(400).send('User already registered.')
+
+        //TODO: hash the password and then store it in db.
+        const salt = await bcrypt.genSalt(10)
+        console.log('salt is: ', salt)
+        const hashedPass = await bcrypt.hash(userObject.password, salt)
+        console.log('password is: ', hashedPass)
 
         user = new User({
             name: userObject.name,
             email: userObject.email,
-            password: userObject.password
+            password: hashedPass
         })
 
         await user.save()
-        res.status(200).send(user) //TODO: Exclude the password property from this doc
+        res.status(200).send({
+            name: user.name,
+            email: user.email,
+        }) //TODO: Exclude the password property from this doc
 
     } catch (e) {
         console.log(e.message)
