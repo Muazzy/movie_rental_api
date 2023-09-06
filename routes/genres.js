@@ -3,6 +3,9 @@ const mongoose = require('mongoose')
 const express = require('express')
 const router = express.Router()
 
+//Middleware
+const auth = require('../middleware/auth')
+
 //get all genres
 router.get('/', async (req, res) => {
     try {
@@ -32,7 +35,7 @@ router.get('/:id', async (req, res) => {
 
 //add a new genre
 
-router.post('/', async function (req, res) {
+router.post('/', auth, async function (req, res) {
     try {
         const genreObj = {
             name: req.body.name
@@ -53,7 +56,7 @@ router.post('/', async function (req, res) {
 })
 
 //update a genre
-router.put('/:id', async function (req, res) {
+router.put('/:id', auth, async function (req, res) {
     try {
         //first validate the incoming changes, if they do not validate to the standards then there's no need to query the db and find the genre for update
         const genreObj = {
@@ -87,7 +90,7 @@ router.put('/:id', async function (req, res) {
 
 
 //delete a genre
-router.delete('/:id', async function (req, res) {
+router.delete('/:id', auth, async function (req, res) {
     try {
         const id = req.params.id
         if (!mongoose.isValidObjectId(id)) {

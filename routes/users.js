@@ -3,7 +3,19 @@ const bcrypt = require('bcrypt')
 // const mongoose = require('mongoose')
 const { User, validateUser } = require('../models/user')
 
+//MIDDLEWARE FOR AUTHORIZATION
+const auth = require('../middleware/auth')
+
 const router = express.Router()
+
+
+//we don't pass in the id of the users in params for security reasons, if we pass in the id then anyone can get information about any user by
+//passing in their id
+router.get('/me', auth, async (req, res) => {
+    const userID = req.user._id
+    const user = await User.findById(userID).select('-password') //exclude the confidential information of the user like password or cc information
+    res.status(200).send(user)
+})
 
 router.post('/', async (req, res) => {
     try {
@@ -20,7 +32,7 @@ router.post('/', async (req, res) => {
         console.log(user)
         if (user) return res.status(400).send('User already registered.')
 
-        //TODO: hash the password and then store it in db.
+
         const salt = await bcrypt.genSalt(10)
         console.log('salt is: ', salt)
         const hashedPass = await bcrypt.hash(userObject.password, salt)
@@ -33,10 +45,15 @@ router.post('/', async (req, res) => {
         })
 
         await user.save()
-        res.status(200).send({
+
+        //generate the auth token and send it in the header when a user registers
+        const token = user.generateAuthToken()
+        console.log('token is:', token)
+
+        res.status(200).header('x-auth-token', token).send({
             name: user.name,
             email: user.email,
-        }) //TODO: Exclude the password property from this doc
+        })
 
     } catch (e) {
         console.log(e.message)

@@ -5,6 +5,9 @@ const mongoose = require('mongoose')
 const express = require('express')
 const router = express.Router()
 
+//Middleware
+const auth = require('../middleware/auth')
+
 router.get('/', async (req, res) => {
     try {
         const movies = await Movie.find().sort({ title: 1 })
@@ -30,7 +33,7 @@ router.get('/:id', async (req, res) => {
     }
 })
 
-router.post('/', async function (req, res) {
+router.post('/', auth, async function (req, res) {
     try {
         const movieObj = {
             title: req.body.title,
@@ -63,7 +66,7 @@ router.post('/', async function (req, res) {
     }
 })
 
-router.put('/:id', async function (req, res) {
+router.put('/:id', auth, async function (req, res) {
     try {
         const movieObj = {
             title: req.body.title,
@@ -109,7 +112,7 @@ router.put('/:id', async function (req, res) {
     }
 })
 
-router.delete('/:id', async function (req, res) {
+router.delete('/:id', auth, async function (req, res) {
     try {
         const id = req.params.id
         if (!mongoose.isValidObjectId(id)) {

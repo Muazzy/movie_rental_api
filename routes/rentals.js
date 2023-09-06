@@ -4,6 +4,8 @@ const { Customer } = require('../models/customer')
 const mongoose = require('mongoose')
 const express = require('express')
 const router = express.Router()
+//Middleware
+const auth = require('../middleware/auth')
 
 router.get('/', async (req, res) => {
     try {
@@ -30,7 +32,7 @@ router.get('/:id', async (req, res) => {
     }
 })
 
-router.post('/', async function (req, res) {
+router.post('/', auth, async function (req, res) {
     try {
         const rentalObj = {
             movieID: req.body.movieID,
