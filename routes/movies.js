@@ -7,6 +7,8 @@ const router = express.Router()
 
 //Middleware
 const auth = require('../middleware/auth')
+const admin = require('../middleware/admin')
+
 
 router.get('/', async (req, res) => {
     try {
@@ -112,7 +114,7 @@ router.put('/:id', auth, async function (req, res) {
     }
 })
 
-router.delete('/:id', auth, async function (req, res) {
+router.delete('/:id', [auth, admin], async function (req, res) {
     try {
         const id = req.params.id
         if (!mongoose.isValidObjectId(id)) {
