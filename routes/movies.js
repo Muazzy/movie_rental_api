@@ -8,17 +8,26 @@ const router = express.Router()
 //Middleware
 const auth = require('../middleware/auth')
 const admin = require('../middleware/admin')
+const asyncMiddleware = require('../middleware/async')
 
 
-router.get('/', async (req, res) => {
-    try {
-        const movies = await Movie.find().sort({ title: 1 })
-        return res.status(200).send(movies)
-    } catch (e) {
-        console.log(e.message)
-        return res.status(500).send('Server Error')
-    }
-})
+// //Repeatative way
+// router.get('/', async (req, res, next) => {
+//     try {
+//         const movies = await Movie.find().sort({ title: 1 })
+//         return res.status(200).send(movies)
+//     } catch (e) {
+//         console.log(e.message)
+//         // return res.status(500).send('Server Error')
+//         next(e)
+//     }
+// })
+
+// using async middlewares
+router.get('/', asyncMiddleware(async (req, res) => {
+    const movies = await Movie.find().sort({ title: 1 })
+    return res.status(200).send(movies)
+}))
 
 router.get('/:id', async (req, res) => {
     try {
